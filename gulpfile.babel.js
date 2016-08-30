@@ -73,7 +73,7 @@ function gulpClean(){
 }
 
 //构建 执行任务并显示处理后的文件大小
-function gulpBuild(){
+function size(){
     return () => {
         gulp.src(PATHS.dist + '**/*')
             .pipe($.size({ 
@@ -92,5 +92,30 @@ gulp.task('scripts', gulpScripts());
 gulp.task('images', gulpImg());
 gulp.task('watching', gulpWatch());
 gulp.task('clean', gulpClean());
-gulp.task('build', ['styles', 'scripts', 'images'], gulpBuild());
+gulp.task('build', ['styles', 'scripts', 'images'], size());
+
+//default 清除输出目录下文件并build重新处理生成文件
 gulp.task('default', ['clean'], () => gulp.start('build')); 
+
+//监视任务
+gulp.task('serve', ['styles', 'scripts', 'images'], gulpServe())
+function gulpServe(){
+    return () => {
+        browserSync({
+            port:8080,
+            server:{
+                baseDir: ['./']
+            }
+        });
+
+        gulp.watch([
+            PATHS.src + 'scss/**/*.scss',
+            PATHS.src + 'js/**/*.js',
+            PATHS.src + 'imges/**/*'
+        ]).on('change',reload);
+
+        gulp.watch(PATHS.src + 'scss/**/*.scss', ['styles']);
+        gulp.watch(PATHS.src + 'js/**/*.js', ['scripts']);
+        gulp.watch(PATHS.src + 'imges/**/*', ['images']);
+    }
+}
