@@ -4,7 +4,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   padding: 0;
   border: 0;
   font-size: 100%;
-  font: inherit;
+  font-family: Helvetica, 'Hiragino Sans GB', 'Microsoft Yahei', '微软雅黑', Arial, sans-serif;
   vertical-align: baseline;
 }
 *:focus {
@@ -33,7 +33,7 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
-input, textarea {
+/*input, textarea {
   padding: 0;
   margin: 0;
   border: none;
@@ -41,7 +41,7 @@ input, textarea {
   outline: none;
   border-radius: 0;
 -webkit-appearance: none;
-}
+}*/
 input[type="submit"], input[type="button"], input[type="reset"] {
   cursor: pointer;
 }

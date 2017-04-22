@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router';
 import styles from './home.less';
 import classNames from 'classnames/bind';
+import HomeLayout from '../../layouts/HomeLayout'
 
 const homestyles = classNames.bind(styles)
 
@@ -12,15 +13,10 @@ class Home extends React.Component {
     const link = homestyles('link-title')
 
     return (
-      <div className={main}>
-        <header>
-          <h1 className={title}>DEMO INDEX PAGE</h1>
-        </header>
-
-        <main>
-          <Link className={link} to="/todolist">Todolist</Link>
-        </main>
-      </div>
+      <HomeLayout title="DEMO INDEX PAGE" rootStyle={main} titleStyle={title}>
+        <Link className={link} to="/demo">Demo</Link>
+        <Link className={link} to="/project1">project1</Link>
+      </HomeLayout>
     );
   }
 }
