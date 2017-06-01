@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>file upload</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div id="upload-area">
+      <!--上传input控件-->
+      <div class="uploadinput-area">
+        <a href="#" id="selectImg" title="上传图片"></a>
+        <input type="file" multiple name="imgfile">
+      </div>
+      <!--文件名-->
+      <span id="allfilename">← upload file</span>
+      <!--提交按钮-->
+      <input type="button" value="提交" id="confirm">
+    </div>
+    <!--进度-->
+    <div class="progress"></div>
+  </div>
+  <!--预览图-->
+  <div class="preview-area"></div>
+
+  <script>
+    const selectImg_A = document.getElementById('selectImg')
+    const upload_buttom = document.getElementById('confirm')
+    const file_input = document.querySelector('input[name="imgfile"]')
+    const preview_area = document.querySelector('.preview-area')
+    const showFilenameDom = document.getElementById('allfilename')
+
+    file_input.addEventListener('change', filePreview, false)
+    upload_buttom.addEventListener('click', event => {
+      uploadFile().then(message => {
+        console.log(message)
+      }).catch(err => {
+        throw new Error(err)
+      })
+    }, false)
+
+    function filePreview(event) {
+      const files = file_input.files
+      let fileName = ''
+      let imgDom = []
+      let fileReaderObj = []
+      let previewDiv = []
+      let Fragment = document.createDocumentFragment()
+      preview_area.innerHTML = ''
+
+      for (let i = 0; i < files.length; i++) {
+        if (!/image\/\w+/.test(files[i].type)) {
+          alert('请上传图片')
+          return
+        }
+        // fileName += files[i].name + ';'
+        fileReaderObj[i] = new FileReader()
+        // 创建preview
+        previewDiv[i] = document.createElement('div')
+        previewDiv[i].className = 'preview'
+        // 创建img 
+        imgDom[i] = document.createElement('img')
+        imgDom[i].file = files[i]
+        // 获取缩略图
+        fileReaderObj[i].readAsDataURL(files[i])
+        fileReaderObj[i].onload = event => {
+          imgDom[i].src = event.target.result
+        }
+        // 将img dom添加到preview dom
+        previewDiv[i].appendChild(imgDom[i])
+        Fragment.appendChild(previewDiv[i])
+      }
+      console.log(files)
+      preview_area.appendChild(Fragment)
+    }
+
+    function uploadFile() {
+      return new Promise((resolve, reject) => {
+        // 利用Formdata模拟表单，用ajax发送文件到服务器
+        const XHR = new XMLHttpRequest()
+        const formData = new FormData()
+
+        const files = file_input.files
+        if (!files[0]) {
+          alert('请先上传文件')
+          reject('plz upload file')
+        }
+        for (let index in files) {
+          formData.append('imgfile', files[index], files[index].name)
+        }
+
+        XHR.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            // 对进度进行处理
+            const progressDom = document.querySelector('.progress')
+            const percentComplete = (event.loaded / event.total) * 100;
+            percentComplete === 100 ? (progressDom.style.width = 0) : (progressDom.style.width = percentComplete + '%')
+          }
+        }
+
+        XHR.open('POST', '/upload')
+        XHR.send(formData)
+
+        XHR.onload = () => {
+          if ((XHR.status >= 200 && XHR.status < 300) || XHR.status == 304) {
+            preview_area.innerHTML = '' //清除缩略图
+            file_input.value = null //清除file input值
+            resolve(XHR.responseText)
+          } else {
+            reject('Request was unsuccessful: ' + xhr.status)
+          }
+        }
+      })
+    }
+  </script>
+</body>
+</html>
