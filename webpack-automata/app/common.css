@@ -1,0 +1,12 @@
+body{
+  background: #ccc
+}
+.class1{
+  color: blue;
+}
+
+:local(.common1text){
+  font-size: 14px;
+  line-height: 20px;
+  composes: class1;
+}
