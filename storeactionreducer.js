@@ -84,16 +84,16 @@ store.subscribe(() => {
 // ----------------------------------------
 
 // 渲染
-function renderApp (appState, old = {}) {
-  if(appState === old) return
+function renderApp (state, oldstate = {}) {
+  if(state === old) return
   console.log('renderapp')
-  renderTitle(appState.title)
-  renderContent(appState.content)
+  renderTitle(state.title)
+  renderContent(state.content)
 }
 
 // 渲染标题
-function renderTitle (title, old = {}) {
-  if(title === old) return
+function renderTitle (title, oldTitle = {}) {
+  if(title === oldTitle) return
   console.log('renderTitle')
   const titleDOM = document.getElementById('title')
   titleDOM.innerHTML = title.text
@@ -101,8 +101,8 @@ function renderTitle (title, old = {}) {
 }
 
 // 渲染内容
-function renderContent (content, old = {}) {
-  if(content === old) return
+function renderContent (content, oldContent = {}) {
+  if(content === oldContent) return
   console.log('content')
   const contentDOM = document.getElementById('content')
   contentDOM.innerHTML = content.text
