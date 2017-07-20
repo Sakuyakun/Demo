@@ -16,7 +16,6 @@ const DropTarget = require("react-dnd").DropTarget;
 const HTML5Backend = require("react-dnd-html5-backend");
 const DragDropContext = require("react-dnd").DragDropContext;
 
-
 // 表格行组件 & 拖拽方法
 let rowSource = {
   beginDrag(props) {
@@ -115,6 +114,7 @@ const DragTable = React.createClass({
   componentWillMount() {
     let { tableHeaderData, tableBodyData } = this.props;
     let cloneObj = this.handleRowDataId(tableBodyData, "add");
+
     // 添加顶置与拖动表格列头
     tableHeaderData = [
       ...tableHeaderData,
@@ -126,7 +126,7 @@ const DragTable = React.createClass({
       tableBodyDataState: cloneObj
     });
   },
-  // 深拷贝对象 否则影响到传入的props
+  // 深拷贝对象并添加id 否则影响到传入的props
   handleRowDataId(Row, Type) {
     let cloneObj = cloneDeep(Row);
     Object.keys(cloneObj).map((item, index) => {
@@ -138,7 +138,7 @@ const DragTable = React.createClass({
     });
     return cloneObj;
   },
-  // 优先级置顶
+  // 优先级置顶 重组数组后传给父组件
   handleSetTop(event, curr_index) {
     if (curr_index != 0) {
       let { tableBodyData } = this.props;
@@ -150,6 +150,7 @@ const DragTable = React.createClass({
       this.props.setTop(tableBodyData);
     }
   },
+  // 表格行拖拽时回调方法
   handleMoveRow(id, afterId) {
     let self = this;
     let rows = clone(this.state.tableBodyDataState);
@@ -169,6 +170,7 @@ const DragTable = React.createClass({
 
     this.setState({ tableBodyDataState: rows });
   },
+  // 表格行拖拽结束回调方法
   handlendDrag() {
     let { tableBodyDataState } = this.state;
     let cloneObj = this.handleRowDataId(tableBodyDataState, "delete");
