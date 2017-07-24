@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Demo</title>
+  <style>
+    body { 
+        margin:30px;
+        width: 100%; 
+    }
+
+    #container{
+        position: relative;
+    }
+    .leftView{
+        position: relative;
+        width: 350px;
+        height: 300px;
+    }
+    .smallImg{
+        max-height: 100%;
+        max-width: 100%;
+    }
+    .mask{
+        display: none;
+        background: rgba(0,0,0,.4);
+        position: absolute;
+        border: 1px solid #ccc;
+        cursor: move;
+    }
+    .rightView{
+        display: none;
+        position: absolute;
+        left:358px;
+        top:0;
+        width:350px;
+        height:300px;
+        overflow:hidden;
+    }
+    .bigImg{
+        position: absolute;
+        top:0;
+        left:0;
+    }
+
+  </style>
+</head>
+<body>
+  <div id="container">
+      <div class="leftView">
+          <div class="mask"></div>
+          <img class="smallImg" src="images/img.jpg" alt="缩小版"/>
+      </div>
+      <div class="rightView">
+          <img class="bigImg" src="images/img.jpg" alt="放大版"/>
+      </div>
+  </div>
+  <script>
+    const EventUtil = {
+        addHandler:function(element,type,handler){
+            if(element.addEventListener){
+                element.addEventListener(type,handler,false)
+            }else if(element.attachEvent){
+                element.attachEvent('on'+type,handler)
+            }else{
+                element['on'+type]=handelr;
+            }
+        },
+        removeHandler:function(element,type,handler){
+            if(element.removeEventListener){
+                element.removeEventListener(type,handler,false);
+            }else if(element.detachEvent){
+                element.detachEvent('on'+type,handler);
+            }else{
+                element['on'+type]=null;
+            }
+        }
+    }
+
+    function getOffset(dom) {
+      const box = dom.getBoundingClientRect()
+      return {
+        left: box.left + window.pageXOffset - document.documentElement.clientLeft,
+        top: box.top + window.pageYOffset - document.documentElement.clientTop
+      }
+    }
+
+    const leftView = document.querySelector('.leftView')
+    const rightView = document.querySelector('.rightView')
+    const bigImg = document.querySelector('.bigImg')
+    const maskdom = document.querySelector('.mask')
+
+    EventUtil.addHandler(leftView, 'mouseover', function (event) {
+      rightView.style.display = 'block'
+
+      const maskheight = ~~(leftView.clientHeight/bigImg.clientHeight*rightView.clientHeight)
+      const maskwidth = ~~(leftView.clientWidth/bigImg.clientWidth*rightView.clientWidth)
+      maskdom.style.height = maskheight + 'px'
+      maskdom.style.width = maskwidth + 'px'
+      maskdom.style.display = 'block'
+    })
+
+    EventUtil.addHandler(leftView, 'mousemove', function (event) {
+      // 指针距离页面最左侧距离 - leftView距离页面最左侧距离 - mask宽度一半
+      let left = event.pageX - getOffset(leftView).left - maskdom.style.width.replace(/px/, () => '') / 2
+      // 指针距离页面顶部距离 - leftView距离页面顶部距离 - mask高度一半
+      let top = event.pageY - getOffset(leftView).top - maskdom.style.height.replace(/px/, () => '') / 2
+
+      if (left < 0) {
+        left = 0
+      } else if (left > leftView.clientWidth - maskdom.clientWidth) {
+        left = leftView.clientWidth - maskdom.clientWidth
+      }
+
+      console.log(left,'1：',leftView.clientWidth - maskdom.clientWidth)
+
+      if (top < 0) {
+        top = 0
+      } else if (top > leftView.clientHeight - maskdom.clientHeight) {
+        top = leftView - maskdom.clientHeight
+      }
+
+      maskdom.style.left = left + 'px'
+      maskdom.style.top = top + 'px'
+
+      const rate = bigImg.clientWidth / leftView.clientWidth
+      bigImg.style.left = -rate * left + 'px'
+      bigImg.style.top = -rate * top + 'px'
+    })
+
+
+    EventUtil.addHandler(leftView, 'mouseout', function (event) {
+      maskdom.style.display = 'none'
+      rightView.style.display = 'none'
+    })
+
+  </script>
+</body>
+</html>
