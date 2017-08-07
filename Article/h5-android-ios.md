@@ -104,12 +104,40 @@ webView.setWebViewClient(new WebViewClient() {
         return false;
     }
     // 该url是调用android方法的请求，通过解析url中的参数来执行相应方法
-    // some java code here...
+    // some code here
     return true;
   }
 });
 ```
 
 # IOS与H5交互
+在找资料的过程中得知，iOS开发中H5的嵌入可以通过UIWebView或者WKWebView。两者都是用来加载web数据的类。UIWebView是在iOS2的时候开始使用的。特点是加载速度慢，占用内存多，优化困难。而WKWebView是在iOS8苹果新推出的，加载速度快，占用内存较少。但具体代码不是太了解，下面是简单实现的代码段。
 
+## JS调用IOS方法
+```objc
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
+{    
+  if ([message.name isEqualToString:@"Share"]) {
+    //some code here
+  }
+}
+```
+JS调用IOS定义好的监听方法名，这个例子中方法名为`Share`
+```javascript
+window.webkit.messageHandlers.Share.postMessage(null)
+```
 
+## IOS调用JS方法
+下面oc代码中info就是在JS中定义的方法名
+```objc
+[self.webView evaluateJavaScript:@"info()" completionHandler:^(id _Nullable response, NSError * _Nullable error) {
+  //some code here
+}];
+```
+```javascript
+const info = () => {
+  console.log('call success')
+}
+```
+
+还可使用WebViewJavascriptBridge库实现JS与IOS原生交互：[Github地址](https://github.com/marcuswestin/WebViewJavascriptBridge)。
