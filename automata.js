@@ -117,5 +117,17 @@ export const automata = {
 
     return typeRes === "array" || length === 0 ||
         typeof length === "number" && length > 0 && (length - 1) in arr;
+  },
+  /**
+  * 金额格式化
+  * @param {string} money
+  * @returns {string}
+  */
+  formatCash (money) {
+    return money.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    
+    // return money.split('').reverse().reduce((prev, next, index) => {
+    //   return ((index % 3) ? next : (next + ',')) + prev
+    // })
   }
 }
