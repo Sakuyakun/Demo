@@ -126,8 +126,39 @@ export const automata = {
   formatCash (money) {
     return money.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     
+    // 方法二
     // return money.split('').reverse().reduce((prev, next, index) => {
     //   return ((index % 3) ? next : (next + ',')) + prev
     // })
-  }
+  },
+
+  /**
+  * 字符串中指定字符是否超过n位，只传字符串则返回一个对象，
+  * @param {string} string
+  * @param {string} chat
+  * @param {number} num
+  * @returns {(boolean|object|string)} 返回对象 字符串 或一个布尔值
+  */
+  chatCount (string = '', chat = null, num = 0) {
+    let str2num = {}
+    const typefn = (strx) => { return Object.prototype.toString.call(strx).slice(8,-1).toLocaleLowerCase() }
+    if (typefn(string) !== 'string') {
+        return string
+    }
+    if (string.length < 2) {
+        return { string: 1 }
+    }
+    for (let i = 1, l = string.length; i <= l; i++) {
+        if (string.charAt(i) in str2num) {
+            str2num[string.charAt(i)]++
+        } else {
+            str2num[string.charAt(i)] = 1
+        }
+    }
+    if (typefn(chat) !== 'null' && (chat in str2num)) {
+        return str2num[chat] >= num
+    } else {
+        return str2num
+    }
+  },
 }
