@@ -1,3 +1,4 @@
+```
 title: Kcptun Shadowsocks加速方案
 date: 2017.02.09 16:23:40
 categories: 网络
@@ -7,6 +8,7 @@ tags:
 - kcptun
 - Shadowsocks
 ---
+```
 
 这篇文章主要是ss+kcptun配置心得，系统环境是MacOS（Windows也可行，使用如putty之类的工具代替MacOS自带的终端）。断断续续折腾了一个多星期成功翻墙并利用kcptun实现加速。
 
