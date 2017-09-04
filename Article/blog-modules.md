@@ -1,3 +1,4 @@
+```
 title: 关于JavaScript模块化
 date: 2016-11-02 05:12:41
 categories: 前端
@@ -6,6 +7,7 @@ tags:
 - 模块化
 - javascript
 ---
+```
 
 模块化的发展程度以致于 ES6 规范中加入了 Module 语法。
 
