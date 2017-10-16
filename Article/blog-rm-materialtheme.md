@@ -1,3 +1,4 @@
+```
 title: 原之质，物之渊
 date: 2017-05-02 21:27:10
 categories: 生活
@@ -5,6 +6,7 @@ thumbnail: "https://www.tuchuang001.com/images/2017/05/10/67674565-file_14942374
 tags:
 - blog
 ---
+```
 
 换了目前较满意的主题顺带写篇我与博客的一些事。  
 
