@@ -1,0 +1,62 @@
+@font-face {
+  font-family: YH;
+  src: local("Microsoft Yahei");
+}
+body{
+  font-family: YH
+}
+
+
+@font-face {
+  font-family: BASE;
+  src: local("HelveticaNeue-Light"), local("Helvetica Neue Light"),  local("PingFang SC"), local("Microsoft YaHei"), local(sans-serif);
+}
+body{
+  font-family: BASE
+}
+
+
+/* 如果i样式为正常体使用FZYaoti，如为斜体则使用FZShuTi字体 */
+@font-face {
+  font-family: 'I';
+  font-style: normal;
+  src: local('FZYaoti');
+}
+@font-face {
+  font-family: 'I';
+  font-style: italic;
+  src: local('FZShuTi');
+}
+.i {
+  font-family: I;
+}
+
+@font-face {
+  font-family: 'QH';
+  font-weight: 400;
+  src: local('HYQihei 40S');
+}
+@font-face {
+  font-family: 'QH';
+  font-weight: 500;
+  src: local('HYQihei 50S');
+}
+@font-face {
+  font-family: 'QH';
+  font-weight: 600;
+  src: local('HYQihei 60S');
+}
+.hy-40s,
+.hy-50s,
+.hy-60s {
+  font-family: 'QH';
+}
+.hy-40s {
+  font-weight: 400;
+}
+.hy-50s {
+  font-weight: 500;
+}
+.hy-60s {
+  font-weight: 600;
+}
