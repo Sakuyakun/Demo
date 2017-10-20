@@ -10,9 +10,6 @@ import {
 // Router
 import Navigation from "./views/navigation";
 import Index from "./views/index";
-import About from "./views/about";
-import ExamplePage from "./views/examplePage";
-import NoMatch from "./views/404";
 
 // 背景图
 import hotaru from "./assets/images/64495434_p0.jpg";
@@ -68,30 +65,7 @@ export default class Routers extends Component {
         {/* Component */}
         <div {...css(styles.bottomarea)}>
           <Switch location={location}>
-            <Route
-              key={location.key}
-              location={location}
-              component={Index}
-              exact
-              path="/"
-            />
-            <Route
-              key={location.key}
-              location={location}
-              component={ExamplePage}
-              path="/examplepage"
-            />
-            <Route
-              key={location.key}
-              location={location}
-              component={About}
-              path="/about"
-            />
-            <Route
-              key={location.key}
-              location={location}
-              component={NoMatch}
-            />
+            <Route key={location.key} location={location} component={Index} exact path="/" />
           </Switch>
         </div>
       </div>

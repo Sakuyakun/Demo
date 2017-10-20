@@ -6,7 +6,7 @@ const OfflinePlugin = require("offline-plugin")
 const { baseConfig, extractPlugin } = require("./webpack.config.js");
 const Clean = require("clean-webpack-plugin");
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const WebpackMonitor = require('webpack-monitor');
+// const WebpackMonitor = require('webpack-monitor');
 
 const prodConfig = {
   entry: {
@@ -73,12 +73,12 @@ const prodConfig = {
         navigateFallbackURL: '/'
       },
     }),
-    new WebpackMonitor({
-      capture: true,
-      target: './stats.json',
-      launch: true,
-      port: 8081,
-    }),
+    // new WebpackMonitor({
+    //   capture: true,
+    //   target: './stats.json',
+    //   launch: true,
+    //   port: 8081,
+    // }),
   ]
 };
 

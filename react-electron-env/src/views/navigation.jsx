@@ -28,35 +28,11 @@ export default class Navigation extends Component {
 
     return (
       <div>
-        <Link
-          {...css(styles.link, location.pathname === "/" && styles.link_hover)}
-          to="/"
-        >
+        <Link {...css(styles.link, location.pathname === "/" && styles.link_hover)} to="/">
           index
         </Link>
-        <Link
-          {...css(
-            styles.link,
-            location.pathname === "/examplepage" && styles.link_hover
-          )}
-          to="/examplepage"
-        >
-          examplepage
-        </Link>
-        <Link
-          {...css(
-            styles.link,
-            location.pathname === "/about" && styles.link_hover
-          )}
-          to="/about"
-        >
-          about
-        </Link>
 
-        <a
-          href="https://github.com/Sakuyakun/Yorha-Boilerplate"
-          target="_blank"
-        >
+        <a href="#" target="_blank">
           <i className={icon_github + css(styles.icon).className} />
         </a>
       </div>
