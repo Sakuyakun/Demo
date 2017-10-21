@@ -7,20 +7,13 @@ import HashRouter from "react-router-dom/HashRouter";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import IndexReducers from "./reducers/index";
 import normalize from "./normalize.scss";
-import * as OfflinePluginRuntime from "offline-plugin/runtime";
-import Electron from "electron";
 
-window.addEventListener('online', updateOnlineStatus)
-window.addEventListener('offline', updateOnlineStatus)
-
-function updateOnlineStatus () {
-  
-}
+// import * as OfflinePluginRuntime from "offline-plugin/runtime";
 
 // offline plugin 自行选择是否开启
-if (process.env.NODE_ENV === "production") {
-  OfflinePluginRuntime.install();
-}
+// if (process.env.NODE_ENV === "production") {
+//   OfflinePluginRuntime.install();
+// }
 // 注销serviceWorker方案
 // if ('serviceWorker' in navigator) {
 //   navigator.serviceWorker.getRegistration().then((registration) => {

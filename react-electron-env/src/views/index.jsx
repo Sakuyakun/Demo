@@ -27,7 +27,7 @@ export default class Index extends Component {
     const { styles } = this.props;
     return (
       <div {...css(styles.index)}>
-        <span {...css(styles.title)}>Yorha Boilerplate</span>
+        <span {...css(styles.title)}>Electron App</span>
       </div>
     );
   }
