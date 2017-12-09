@@ -46,9 +46,9 @@ const TodoItem = (props) => {
 
 // render
 const todosWithHOC = compose(
-  withEither(isTodosLoading, loadingTodos), 
+  withEither(isTodosEmpty, emptyTodos),
   withMaybeNull(isTodosNull), 
-  withEither(isTodosEmpty, emptyTodos)
+  withEither(isTodosLoading, loadingTodos)
 )
 const TodosRender = todosWithHOC(TodoList)
 
