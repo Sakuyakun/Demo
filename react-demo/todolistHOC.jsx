@@ -10,6 +10,15 @@ const compose = (...fns) => {
   }
 };
 
+// Condition
+const isTodosNull = (props) => !props.todos;
+const isTodosEmpty = (props) => !props.todos.length;
+const isTodosLoading = (props) => props.isloading;
+
+// EitherComp
+const emptyTodos = () => {return <div><p>You have no Todos.</p></div>}
+const loadingTodos = () => {return <div><p>Loading todos ...</p></div>}
+
 // HOC
 const withMaybeNull = isNull => Comp => (props) => {
   return isNull(props)
@@ -21,15 +30,11 @@ const withEither = (conditionalRenderFn, EitherCom) => (Comp) => (props) => {
     ? <EitherCom />
     : <Comp { ...props } />
 }
-
-// Condition
-const isTodosNull = (props) => !props.todos;
-const isTodosEmpty = (props) => !props.todos.length;
-const isTodosLoading = (props) => props.isloading;
-
-// EitherComp
-const emptyTodos = () => {return <div><p>You have no Todos.</p></div>}
-const loadingTodos = () => {return <div><p>Loading todos ...</p></div>}
+const todosWithHOC = compose(
+  withEither(isTodosEmpty, emptyTodos),
+  withMaybeNull(isTodosNull), 
+  withEither(isTodosLoading, loadingTodos)
+)
 
 // Components
 const TodoList = (props) => {
@@ -45,11 +50,6 @@ const TodoItem = (props) => {
 }
 
 // render
-const todosWithHOC = compose(
-  withEither(isTodosEmpty, emptyTodos),
-  withMaybeNull(isTodosNull), 
-  withEither(isTodosLoading, loadingTodos)
-)
 const TodosRender = todosWithHOC(TodoList)
 
 class App extends Component {
