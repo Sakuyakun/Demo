@@ -1,4 +1,4 @@
-conf step:
+step:
 
 1. npm install -g create-react-app
 
@@ -6,7 +6,7 @@ conf step:
 
 3. yarn run eject
 
-4. yarn install babel-plugin-import babel-plugin-transform-decorators-legacy babel-preset-env
+4. yarn install react-router-dom babel-preset-env babel-plugin-import babel-plugin-transform-decorators-legacy babel-plugin-transform-class-properties
 
 5. add .babelrc
 
@@ -22,6 +22,7 @@ conf step:
     }]
   ],
   "plugins": [
+    "transform-class-properties",
     "transform-decorators-legacy"
   ]
 }
@@ -111,4 +112,37 @@ conf step:
   // ...
   "dev": "npm run start"
 },
+```
+
+9. add '@' alias
+```js
+// ./config/webpack.config.dev.js
+alias: {
+  // Support React Native Web
+  // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
+  'react-native': 'react-native-web',
+  '@': path.join(__dirname, '../src')
+}
+
+// ./config/paths.js
+module.exports = {
+  appIndexJs: resolveApp('src/index.jsx'),
+}
+```
+
+10. clean dir
+
+delete src dir files then add index.jsx
+
+```js
+// index.jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import registerServiceWorker from '@/registerServiceWorker';
+
+ReactDOM.render(
+  <div></div>,
+  document.getElementById('root')
+);
+registerServiceWorker();
 ```
