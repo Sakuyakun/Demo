@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>font switch</title>
+  <style>
+    body { margin: 0; padding: 0; }
+    div { width: 100%; height: 30px; display: flex; justify-content: space-between; position: relative; }
+    
+    span { transition: transform 0.5s; display: inline-block; }
+    .before:first-child { transform: translateX(10px) }
+    .before:last-child {transform: translateX(-10px) }
+    .switch:first-child {transform: translateX(calc(100vw - 100% - 10px)) }
+    .switch:last-child {transform: translateX(calc(100vw + 100% + 10px)) }
+  </style>
+</head>
+<body>
+  <div>
+    <span class="before">Red</span>
+    <span><<<>>></span>
+    <span class="before">Blue</span>
+  </div>
+  <button>Switch</button>
+  
+  <script>
+    const button = document.querySelector('button')
+    const spans = document.querySelectorAll('.before')
+    let switchOff = false
+    button.addEventListener('click', event => {
+      switchOff = !switchOff;
+      [...spans].forEach(span => {
+        span.className = switchOff ? 'switch' : 'before'
+      })
+    }, false)
+  </script>
+</body>
+</html>
