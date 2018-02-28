@@ -1,0 +1,21 @@
+/*
+Alerts
+An alert box requires a contextual class to specify its importance.
+一个警告信息框需要与语境有关的的类来指定其重要性
+
+Markup:
+<div>
+  Take note of this important alert message.
+</div>
+
+alert-success - Something good or successful 好的或成功的
+alert-info - Something worth noting, but not super important 不那么重要的
+alert-warning - Something to note, may require attention 需要被提示并记录，需要引起注意的
+alert-danger - Something important. Usually signifies an error. 非常重要的，常用于错误
+
+Styleguide Alerts
+*/
+.alert {}
+.alert-success {}
+.alert-warning {}
+.alert-danger {}
