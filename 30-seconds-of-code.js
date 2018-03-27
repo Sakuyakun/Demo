@@ -31,4 +31,13 @@ const shuffle = arr => arr.sort(() => Math.random() - 0.5);
 // 返回两个数组中都显示的元素的数组
 const similarity = (arr, values) => arr.filter(v => values.includes(v));
 
+// 去重
+const unique = arr => arr.filter((item, index, array) => array.indexOf(item) === index);
+const unique_2 = arr => [...new Set(arr)];
+
+// 数组最大值
+const maxval = arr => arr.reduce((prev, next) => Math.max(prev, next))
+const maxval_2 = arr => Math.max(...arr)
+
+
 
