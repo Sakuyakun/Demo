@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>download demo</title>
+</head>
+<body>
+  <div id="handle">
+    <input id="input-a" type="file">
+    <button id="preview-btn">预览</button>
+    <button id="preview-download">下载</button>
+    <button id="preview-reset">重置</button>
+  </div>
+  <div id="preview-area"></div>
+
+  <script src="https://cdn.bootcss.com/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/xlsx/0.16.0/xlsx.full.min.js"></script>
+
+  <script>
+    const methods = {
+      parseFile () {
+        const files = document.querySelector('#input-a').files || []
+        if (!files.length) return false
+        const file = files[0]
+
+        console.time()
+
+        const reader = new FileReader()
+        reader.onload = function (event) {
+          const arrayBuffer = reader.result
+          const options = {
+            type: 'array'
+          }
+
+          const workbook = XLSX.read(arrayBuffer, options)
+
+          console.timeEnd()
+
+          const sheetName = workbook.SheetNames
+          const sheet = workbook.Sheets[sheetName]
+          document.querySelector('#preview-area').innerHTML = XLSX.utils.sheet_to_html(sheet, {
+            id: 'exceldemo',
+            editable: true
+          })
+        }
+        reader.readAsArrayBuffer(file)
+      },
+
+      download () {
+        // 使用 js-xlsx 生成 excel 文件的数据再转为 Blob 数据下载
+        if (document.querySelector('#exceldemo') === null) return false
+        const tableDOM = document.querySelector('#exceldemo')
+        const workbook = XLSX.utils.table_to_book(tableDOM)
+        const _buffer = XLSX.write(workbook, {
+          bookType: 'xlsx',
+          bookSST: true,
+          type: 'array'
+        })
+
+        const _blob = new Blob(
+          [_buffer],
+          { type: 'application/octet-stream' },
+        )
+        
+        try{
+          saveAs(_blob, `${new Date().getFullYear()}${new Date().getMonth()}${new Date().getDate()}.xlsx`)
+        } catch (e) {
+          throw new Error(e)
+        }
+      },
+
+      reset () {
+        document.querySelector('#preview-area').innerHTML = ''
+        document.querySelector('#input-a').value = ''
+      }
+    }
+
+    document.querySelector('#handle').addEventListener('click', function (event) {
+      const ID = event.target.id
+      if (ID === 'preview-btn') {
+        methods.parseFile()
+      } else if (ID === 'preview-download') {
+        methods.download()
+      } else if (ID === 'preview-reset') {
+        methods.reset()
+      }
+    })
+  </script>
+</body>
+</html>
