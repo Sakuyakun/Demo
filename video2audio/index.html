@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>video to audio</title>
+</head>
+<body>
+  <div id="handle">
+    <input type="file" id="upload-input">
+    <button id="play-btn" hidden>播放</button>
+    <button id="extract-btn" hidden>提取</button>
+    <button id="reset-btn" hidden>重置</button>
+  </div>
+
+  <script src="./audiobuffer-to-wav.js"></script>
+  <script src="https://cdn.bootcss.com/FileSaver.js/2014-11-29/FileSaver.min.js"></script>
+
+  <script>
+    window.AudioContext = window.AudioContext || window.webkitAudioContext
+
+    function AudioAnalysis (videoFile) {
+      let audioContext = new AudioContext()
+      let reader = new FileReader()
+
+      let audioNode = null
+      let playAudio = function () {
+        audioNode.start()
+      }
+      let extractAudio = function () {
+        let wav = audioBufferToWav(audioNode.buffer)
+        let blob = new Blob([new DataView(wav)], {
+          type: 'audio/wav'
+        })
+        saveAs(blob, videoFile.name.replace(/\.\w+$/, '.wav'))
+      }
+
+      reader.onload = () => {
+        let videoFileAsBuffer = reader.result
+        // 解码 ArrayBuffer 成音频数据，用于 web audio API 音频源
+        audioContext.decodeAudioData(videoFileAsBuffer).then(buffer => {
+          const {
+            duration, // buffer 长度
+            length, // 采样帧缓冲区的大小
+            numberOfChannels, // 声道数
+            sampleRate // 线性音频数据的采样率，每秒采样帧
+          } = buffer
+
+          // 使用 OfflineAudioContext 渲染音频
+          let offlineCtx = new OfflineAudioContext(numberOfChannels, length, sampleRate)
+          let soundSource = offlineCtx.createBufferSource()
+          soundSource.buffer = buffer
+          soundSource.connect(offlineCtx.destination)
+          soundSource.start()
+
+          offlineCtx.startRendering().then(renderedBuffer => {
+            console.log('音频渲染成功')
+            let newAudioContext = new AudioContext()
+            audioNode = newAudioContext.createBufferSource()
+            audioNode.buffer = renderedBuffer
+            audioNode.connect(newAudioContext.destination)
+          }).catch(function (err) {
+            console.log('音频渲染成功: ' + err);
+          })
+        })
+      }
+      // 将实例化的 FileReader 将上传的文件读取转为 ArrayBuffer
+      reader.readAsArrayBuffer(videoFile)
+
+      return {
+        play: playAudio,
+        extract: extractAudio
+      }
+    }
+
+    let currentAudio = null
+
+    document.querySelector('#upload-input').addEventListener('change', function (event) {
+      if (currentAudio !== null) {
+        currentAudio = null
+        document.querySelector('#upload-input').value = ''
+      }
+      let files = this.files[0]
+      if (files === undefined || files.type.indexOf('video/') === -1) return false
+      currentAudio = new AudioAnalysis(files)
+      if (this.files.length > 0) {
+        document.querySelector('#play-btn').style.display = 'inline-block'
+        document.querySelector('#extract-btn').style.display = 'inline-block'
+        document.querySelector('#reset-btn').style.display = 'inline-block'
+      }
+    })
+    document.querySelector('#handle').addEventListener('click', function (event) {
+      let currentID = event.target.id
+      if (currentID === 'play-btn') {
+        currentAudio.play()
+      } else if (currentID === 'extract-btn') {
+        currentAudio.extract()
+      } else if (currentID === 'reset-btn') {
+        currentAudio = null
+        document.querySelector('#upload-input').value = ''
+      }
+    })
+  </script>
+</body>
+</html>
