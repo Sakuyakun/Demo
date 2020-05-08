@@ -24,15 +24,13 @@
       let reader = new FileReader()
 
       let audioNode = null
+      let wavBlob = null
+      
       let playAudio = function () {
         audioNode.start()
       }
       let extractAudio = function () {
-        let wav = audioBufferToWav(audioNode.buffer)
-        let blob = new Blob([new DataView(wav)], {
-          type: 'audio/wav'
-        })
-        saveAs(blob, videoFile.name.replace(/\.\w+$/, '.wav'))
+        saveAs(wavBlob, videoFile.name.replace(/\.\w+$/, '.wav'))
       }
 
       reader.onload = () => {
@@ -59,6 +57,9 @@
             audioNode = newAudioContext.createBufferSource()
             audioNode.buffer = renderedBuffer
             audioNode.connect(newAudioContext.destination)
+            wavBlob = new Blob([new DataView(audioBufferToWav(audioNode.buffer))], {
+              type: 'audio/wav'
+            })
           }).catch(function (err) {
             console.log('音频渲染成功: ' + err);
           })
