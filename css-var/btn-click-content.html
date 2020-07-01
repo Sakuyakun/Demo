@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    html, body{
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+    body:active::after{
+      opacity: 1;
+      transform: translate(-50%, -100%);
+      transition: 0s;
+      left: -999px;
+    }
+    body::after{
+      content: 'veveveveve';
+      position: fixed;
+      z-index: 999;
+
+      left: calc(var(--x, -999) * 1px);
+      top: calc(var(--y, -999) * 1px);
+
+      opacity: 0;
+      transform: translate(-50%, calc(-100% - 20px));
+      transition: opacity .5s, transform .3s;
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    document.addEventListener('mousedown', event => {
+      document.documentElement.style.setProperty('--x', event.clientX)
+      document.documentElement.style.setProperty('--y', event.clientY)
+    })
+  </script>
+</body>
+
+</html>
