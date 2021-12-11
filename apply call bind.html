@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    const obj_source = {
+      number1: 0,
+      objfn: function (val) {
+        console.log(this.number1, val)
+      }
+    }
+    const obj_use = {
+      number1: 1
+    }
+
+    Function.prototype.myCall = function (context) {
+      context = context || window
+
+      // this为objfn函数，用一个额外的属性fn将它暂时保存起来好调用
+      context.fn = this
+      // 获取传入的参数
+      let args = Array.from(arguments).slice(1)
+      let result = context.fn(args)
+      delete context.fn
+      return result
+    }
+    obj_source.objfn.myCall(obj_use, 1, 2, 3)
+
+    Function.prototype.myApply = function (context) {
+      context = context || window
+
+      // this为objfn函数，用一个额外的属性fn将它暂时保存起来好调用
+      context.fn = this
+
+      let result = undefined
+      // 获取传入的参数
+      if (arguments[1]) {
+        result = context.fn(...arguments[1])
+      } else {
+        result = context.fn()
+      }
+      delete context.fn
+      return result
+    }
+    // obj_source.fn.myApply(obj_use, [1,2,3])
+
+    // bind
+    Function.prototype.myBind = function (context) {
+      const _this = this
+      const args = Array.from(arguments).slice(1)
+      return function F () {
+        if (this instanceof F) {
+          return new _this(...args, ...arguments)
+        } else {
+          return _this.apply(context, args.concat(...arguments))
+        }
+      }
+    }
+    // const fn = obj_source.fn
+    // const fn_bind = obj_source.fn.myBind(obj_use)
+    // fn_bind()
+    
+  </script>
+</body>
+</html>
