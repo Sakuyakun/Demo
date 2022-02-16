@@ -1,23 +1,28 @@
-import { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+
+declare type Key = React.Key
+type RowKeysWithPageNum = {
+  [key: string]: Key[]
+}
 
 export default () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<any>({})
-  const [computedRowKeys, setComputedRowKeys] = useState<any>([])
+  const [selectedRowKeys, setSelectedRowKeys] = useState<RowKeysWithPageNum>({})
+  const [computedRowKeys, setComputedRowKeys] = useState<Key[]>([])
 
-  const handleCancelAllSelect = () => {
+  const handleCancelAllSelect = useCallback(() => {
     setSelectedRowKeys({})
-  }
+  }, [])
 
-  const handleRowSelectChange = useCallback((rowkeys_curr: any, currPage: number) => {
-    let newObj = {
+  const handleRowSelectChange = (rowkeys_curr: Key[], currPage: string) => {
+    let newObj: RowKeysWithPageNum = {
       ...selectedRowKeys,
     }
     newObj[currPage] = rowkeys_curr
     setSelectedRowKeys(newObj)
-  }, [selectedRowKeys])
+  }
 
   useEffect(() => {
-    let rowkeys_count: any = []
+    let rowkeys_count: Key[] = []
     let keys = Object.keys(selectedRowKeys)
     if (keys.length) {
       keys.forEach((rowkeys: string) => {
