@@ -17,10 +17,12 @@ type Props = {
   searchItems?: Array<any>[], // 搜索时匹配的属性
   searchPlaceholder?: Array<string>[] | undefined, // 搜索框的placeHolder
   notFoundContent?: string, // 无数据时的文本
+  rightExtendNode?: any, // 右侧Tree节点的自定义渲染节点
   onMove?: Function, // 数据移动时触发的函数，默认参数一为选择的keys，参数二为数组形式的JSON字符串数据为为选择之后左侧的数据源和右侧的数据源
 }
 
 const { Search } = Input;
+const { TreeNode } = Tree
 
 export default class TreeTransfer extends Component<Props, State> {
   static defaultProps = {
@@ -36,6 +38,7 @@ export default class TreeTransfer extends Component<Props, State> {
     disabled: false,
     leftDisabled: false,
     rightDisabled: false,
+    rightExtendNode: null
   }
 
   constructor(props: any) {
@@ -398,6 +401,28 @@ export default class TreeTransfer extends Component<Props, State> {
     });
   };
 
+  // 递归渲染树节点
+  renderRightTreeNode = (treeNode: any) => {
+    let renderTitle = (node: any) => {
+      return (
+        <div>
+          <span>{node.title}</span>
+          {this.props.rightExtendNode && this.props.rightExtendNode(node)}
+        </div>
+      )
+    }
+
+    return treeNode.map((node: any) => {
+      return (
+        <TreeNode title={renderTitle(node)} key={node.key} disabled={node.disabled}>
+          {
+            node.children?.length > 0 && this.renderRightTreeNode(node.children)
+          }
+        </TreeNode>
+      )
+    })
+  }
+
   render() {
     const { leftTree, rightTree } = this.state
     const { title, showSearch, searchPlaceholder, notFoundContent }: any = this.props
@@ -490,11 +515,12 @@ export default class TreeTransfer extends Component<Props, State> {
                   autoExpandParent={rightTree.autoExpandParent}
                   filterTreeNode={rightFilterTreeNode}
                   onExpand={keys => this.handleExpand(keys, 'right')}
-                  treeData={rightTree.dataSource}
                   checkable
                   onCheck={(keys, info) => this.onCheck(keys, info, 'right', false)}
                   checkedKeys={rightTree.checkedKeys}
-                />
+                >
+                  {this.renderRightTreeNode(rightTree.dataSource)}
+                </Tree>
               </div>
             )
           }
