@@ -6,6 +6,7 @@ import styles from './style.module.scss';
 
 type State = any
 type Props = {
+  className?: string,
   dataSource: Array<any>[], // 全量的tree数据源
   title: string[], // 穿梭框的标题
   defaultValues?: Array<any>[], // 默认的初始值，只在组件第一次渲染时生效
@@ -18,6 +19,7 @@ type Props = {
   searchPlaceholder?: Array<string>[] | undefined, // 搜索框的placeHolder
   notFoundContent?: string, // 无数据时的文本
   rightExtendNode?: any, // 右侧Tree节点的自定义渲染节点
+  draggable?: boolean, // 开启拖拽
   onMove?: Function, // 数据移动时触发的函数，默认参数一为选择的keys，参数二为数组形式的JSON字符串数据为为选择之后左侧的数据源和右侧的数据源
 }
 
@@ -26,10 +28,11 @@ const { TreeNode } = Tree
 
 export default class TreeTransfer extends Component<Props, State> {
   static defaultProps = {
+    className: '',
     dataSource: [],
     values: undefined,
     defaultValues: [],
-    onMove: () => {},
+    onMove: () => { },
     title: ['左侧标题', '右侧标题'],
     showSearch: true,
     searchItems: ['label', 'key'],
@@ -38,6 +41,7 @@ export default class TreeTransfer extends Component<Props, State> {
     disabled: false,
     leftDisabled: false,
     rightDisabled: false,
+    draggable: false,
     rightExtendNode: null
   }
 
@@ -90,7 +94,7 @@ export default class TreeTransfer extends Component<Props, State> {
     }
   }
 
-  changeDataSource = (props: any , filterValues: any ) => {
+  changeDataSource = (props: any, filterValues: any) => {
     const { dataSource, disabled, leftDisabled, rightDisabled } = props;
     let newDataSource = cloneDeep(dataSource); // 新的全量数据
     // 如果设置disabled时将数据源全部disabled(数据结构参考Tree组件)
@@ -119,7 +123,7 @@ export default class TreeTransfer extends Component<Props, State> {
   };
 
   // 初始的数据赋值(根据selectValues以及dataSources计算左右侧的展示数据，同时会处理disabled属性)
-  changeData = (props: any , filterValues: any ) => {
+  changeData = (props: any, filterValues: any) => {
     const { dataSource, disabled, leftDisabled, rightDisabled } = props;
     let newDataSource = cloneDeep(dataSource); // 新的全量数据
     // 如果设置disabled时将数据源全部disabled(数据结构参考Tree组件)
@@ -145,7 +149,7 @@ export default class TreeTransfer extends Component<Props, State> {
   };
 
   // 选择checkbox时改变状态的方法
-  operationOnCheck = (keys: any , data: any , direction: any , rightToLeft: any , callback?: any) => {
+  operationOnCheck = (keys: any, data: any, direction: any, rightToLeft: any, callback?: any) => {
     const { leftDisabled, rightDisabled } = this.props;
     const newData = filterCategoryData(keys, data, 'filter', rightToLeft ? leftDisabled : false); // 去除选中的数据
     const selectDataCategory = filterCategoryData(keys, data, 'select', rightDisabled); // 选中的数据
@@ -154,7 +158,7 @@ export default class TreeTransfer extends Component<Props, State> {
     if (rightToLeft) {
       // rightToLeft为true时会重新计算左侧Tree的selectDataSource和filterSelectDataSource
       const { leftTree: { checkedKeys } } = this.state;
-      const newLeftKeys = [ ...checkedKeys, ...keys ];
+      const newLeftKeys = [...checkedKeys, ...keys];
       const newLeftFilterData = filterCategoryData(newLeftKeys, data, 'filter', leftDisabled);
       const newLeftSelectData = filterCategoryData(newLeftKeys, data, 'select', leftDisabled);
       // 右面选中移动到左边时生成左边的数据
@@ -178,10 +182,10 @@ export default class TreeTransfer extends Component<Props, State> {
   };
 
   // 选中时的方法(rightToLeft表示右边移动到左边时调用该函数)
-  onCheck = (keys: any , info: any , direction: any , rightToLeft: any , callback?: any ) => {
+  onCheck = (keys: any, info: any, direction: any, rightToLeft: any, callback?: any) => {
     const { dataSource } = this.props;
     // 选择的keys中是最后一级的keys
-    const lastLevelKey = keys.filter((item : any) => isLastLevelKey(dataSource, item));
+    const lastLevelKey = keys.filter((item: any) => isLastLevelKey(dataSource, item));
 
     if (direction === 'left') {
       this.setState(
@@ -191,7 +195,7 @@ export default class TreeTransfer extends Component<Props, State> {
             // 如果rightToLeft为true时checkedKeys还是原来的checkedKeys，否则为lastLevelKey
             checkedKeys: rightToLeft ? this.state.leftTree.checkedKeys : lastLevelKey,
             // 如果rightToLeft为true时keys是原来的checkedKeys加selectValues，否则为lastLevelKey加selectValues
-            keys: rightToLeft ? uniq([ ...this.state.selectValues, ...this.state.leftTree.checkedKeys ]) : uniq([ ...this.state.selectValues, ...lastLevelKey ])
+            keys: rightToLeft ? uniq([...this.state.selectValues, ...this.state.leftTree.checkedKeys]) : uniq([...this.state.selectValues, ...lastLevelKey])
           },
         },
         () => {
@@ -220,6 +224,8 @@ export default class TreeTransfer extends Component<Props, State> {
   leftToRight = () => {
     const { onMove } = this.props;
     const { leftTree: { selectDataSource, filterSelectDataSource } } = this.state;
+
+
 
     this.setState(
       {
@@ -405,7 +411,7 @@ export default class TreeTransfer extends Component<Props, State> {
   renderRightTreeNode = (treeNode: any) => {
     let renderTitle = (node: any) => {
       return (
-        <div>
+        <div style={{ width: '100%' }}>
           <span>{node.title}</span>
           {this.props.rightExtendNode && this.props.rightExtendNode(node)}
         </div>
@@ -423,16 +429,82 @@ export default class TreeTransfer extends Component<Props, State> {
     })
   }
 
+  onDrop = (info: any) => {
+    console.log(info);
+    const dropKey = info.node.key;
+    const dragKey = info.dragNode.key;
+    const dropPos = info.node.pos.split('-');
+    const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]);
+
+    const loop = (data, key, callback) => {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].key === key) {
+          return callback(data[i], i, data);
+        }
+        if (data[i].children) {
+          loop(data[i].children, key, callback);
+        }
+      }
+    };
+    const data = [...this.state.rightTree.dataSource];
+
+    let dragObj;
+    loop(data, dragKey, (item, index, arr) => {
+      arr.splice(index, 1);
+      dragObj = item;
+    });
+
+    if (!info.dropToGap) {
+      // Drop on the content
+      loop(data, dropKey, item => {
+        item.children = item.children || [];
+        // where to insert 示例添加到头部，可以是随意位置
+        item.children.unshift(dragObj);
+      });
+    } else if (
+      (info.node.props.children || []).length > 0 && // Has children
+      info.node.props.expanded && // Is expanded
+      dropPosition === 1 // On the bottom gap
+    ) {
+      loop(data, dropKey, item => {
+        item.children = item.children || [];
+        // where to insert 示例添加到头部，可以是随意位置
+        item.children.unshift(dragObj);
+        // in previous version, we use item.children.push(dragObj) to insert the
+        // item to the tail of the children
+      });
+    } else {
+      let ar;
+      let i;
+      loop(data, dropKey, (item, index, arr) => {
+        ar = arr;
+        i = index;
+      });
+      if (dropPosition === -1) {
+        ar.splice(i, 0, dragObj);
+      } else {
+        ar.splice(i + 1, 0, dragObj);
+      }
+    }
+
+    this.setState({
+      rightTree: {
+        ...this.state.rightTree,
+        dataSource: data
+      },
+    });
+  }
+
   render() {
     const { leftTree, rightTree } = this.state
-    const { title, showSearch, searchPlaceholder, notFoundContent }: any = this.props
+    const { title, showSearch, searchPlaceholder, notFoundContent, className, draggable }: any = this.props
     const leftFilterTreeNode =
       (node: any) => leftTree.matchedKeys && leftTree.matchedKeys.indexOf(node.props.eventKey) > -1
     const rightFilterTreeNode =
       (node: any) => rightTree.matchedKeys && rightTree.matchedKeys.indexOf(node.props.eventKey) > -1
 
     return (
-      <div className={styles['dyx-tree-transfer']}>
+      <div className={`${styles['dyx-tree-transfer']} ${className}`}>
 
         {/* transfer左侧 */}
         <div className={styles['dyx-transfer-box']}>
@@ -491,7 +563,9 @@ export default class TreeTransfer extends Component<Props, State> {
 
         {/* transfer右侧 */}
         <div className={styles["dyx-transfer-box"]}>
-          <div className={styles["dyx-transfer-box-title"]}>{get(title, 1, '已选择')}</div>
+          <div className={styles["dyx-transfer-box-title"]}>
+            <span>{get(title, 1, '已选择')}</span>
+          </div>
           {/* 右侧搜索 */}
           {
             showSearch && (
@@ -518,6 +592,11 @@ export default class TreeTransfer extends Component<Props, State> {
                   checkable
                   onCheck={(keys, info) => this.onCheck(keys, info, 'right', false)}
                   checkedKeys={rightTree.checkedKeys}
+                  draggable={{
+                    icon: false,
+                    nodeDraggable: (node: any) => draggable
+                  }}
+                  onDrop={this.onDrop}
                 >
                   {this.renderRightTreeNode(rightTree.dataSource)}
                 </Tree>
