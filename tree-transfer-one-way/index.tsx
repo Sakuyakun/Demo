@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useImperativeHandle } from 'react'
 
-import { Button, Tree, Tooltip } from 'antd'
+import { Button, Tree } from 'antd'
 import { filterSource, findNode, findPath, createTreeMap, createFinalRightTree, getAllKeys, createCombieTree, createDisabledSource } from './utils'
 
 import styles from './index.module.scss'
@@ -57,10 +57,11 @@ export default ({
       setRightTreeDataSource(newRightTree)
     } else {
       // 对比 rightTreeDataSource 和 newRightTree
-      // 1. 把 newRightTree 转为 map
+      // 1. 把 newRightTree 转为 key 对应 treeNode 节点的 map 格式
       let newRightTreeMap = createTreeMap(newRightTree)
+      console.log('newRightTreeMap', newRightTreeMap)
 
-      // 2. 过滤 newRightTreeMap 仅保留未添加到右边树的 node
+      // 2. 过滤 newRightTreeMap 仅保留未添加到右边树的 treeNode
       let rightTreeDataSourceKeys = getAllKeys(rightTreeDataSource)
       let filterNewRightTreeMap = {}
       Object.keys(newRightTreeMap).forEach(key => {
@@ -69,15 +70,15 @@ export default ({
         }
       })
       const combieNewRightTreeMap = createCombieTree(filterNewRightTreeMap)
-      const filterNewRightTreeMapKey = Object.keys(combieNewRightTreeMap)
+      const combieNewRightTreeMapKey = Object.keys(combieNewRightTreeMap)
       console.log('combieNewRightTreeMap', combieNewRightTreeMap)
-      console.log('filterNewRightTreeMapKey', filterNewRightTreeMapKey)
+      console.log('combieNewRightTreeMapKey', combieNewRightTreeMapKey)
 
       // 2. 根据 filterNewRightTreeMap 加入 rightTreeDataSource，递归对比
       // 如果没有相同key 但有相同父节点，将 treenode 加入父节点
       // 如果没有相同key 并且没有相同父节点，将 treenode 添加到根
       let finalTree = cloneDeep(rightTreeDataSource)
-      createFinalRightTree(finalTree, finalTree, null, combieNewRightTreeMap, filterNewRightTreeMapKey)
+      createFinalRightTree(finalTree, finalTree, null, combieNewRightTreeMap, combieNewRightTreeMapKey)
       console.log(finalTree)
       setRightTreeDataSource(finalTree)
     }
@@ -303,9 +304,9 @@ export default ({
           <div className={styles['transfer-box-top']}>
             <span>{props.title[1]}</span>
             <div className={styles['transfer-box-btnarea']}>
-              <Tooltip title="新增根菜单">
+              {/* <Tooltip title="新增根菜单">
                 <Button type="text" />
-              </Tooltip>
+              </Tooltip> */}
             </div>
           </div>
           {
