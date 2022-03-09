@@ -143,24 +143,61 @@ export default ({
     return keys
   }
 
-  // 递归渲染右边树结构
-  const renderRightTreeNode = (treeNode: any, parentNode: any) => {
-    let renderTitle = (node: any) => {
-      return (
+  // 递归渲染右边树结构 方式一 渲染子节点 提示废弃
+  // const renderRightTreeNode = (treeNode: any, parentNode: any) => {
+  //   let renderTitle = (node: any) => {
+  //     return (
+  //       <div style={{ width: '100%' }}>
+  //         <span>{node.title}</span>
+  //         <div style={{ float: 'right' }}>
+  //           <a
+  //             onClick={() => {
+  //               const sourceNode = findNode(dataSource, (n) => n.key === node.key)
+  //               handleEdit && handleEdit(node, sourceNode)
+  //             }}
+  //             style={{ paddingRight: '10px' }}
+  //           >
+  //             编辑
+  //           </a>
+  //           <a
+  //             onClick={() => { rightTreeDelete(node) }}
+  //             style={{ paddingRight: '10px' }}
+  //           >
+  //             删除
+  //           </a>
+  //         </div>
+  //       </div>
+  //     )
+  //   }
+
+  //   return treeNode.map((node: any) => {
+  //     return (
+  //       <TreeNode title={renderTitle(node)} key={node.key} disabled={node.disabled}>
+  //         {
+  //           node.children?.length > 0 && renderRightTreeNode(node.children, node)
+  //         }
+  //       </TreeNode>
+  //     )
+  //   })
+  // }
+  // 递归渲染右边树结构 方式二 给treeData属性赋值
+  const loop = data => {
+    return data.map(item => {
+      const title = (
         <div style={{ width: '100%' }}>
-          <span>{node.title}</span>
+          <span>{item.title}</span>
           <div style={{ float: 'right' }}>
             <a
               onClick={() => {
-                const sourceNode = findNode(dataSource, (n) => n.key === node.key)
-                handleEdit && handleEdit(node, sourceNode)
+                const sourceNode = findNode(dataSource, (n) => n.key === item.key)
+                handleEdit && handleEdit(item, sourceNode)
               }}
               style={{ paddingRight: '10px' }}
             >
               编辑
             </a>
             <a
-              onClick={() => { rightTreeDelete(node) }}
+              onClick={() => { rightTreeDelete(item) }}
               style={{ paddingRight: '10px' }}
             >
               删除
@@ -168,17 +205,16 @@ export default ({
           </div>
         </div>
       )
-    }
+      if (item.children) {
+        return { title, key: item.key, children: loop(item.children) };
+      }
 
-    return treeNode.map((node: any) => {
-      return (
-        <TreeNode title={renderTitle(node)} key={node.key} disabled={node.disabled}>
-          {
-            node.children?.length > 0 && renderRightTreeNode(node.children, node)
-          }
-        </TreeNode>
-      )
-    })
+      return {
+        title,
+        key: item.key,
+        parent: item.parent
+      };
+    });
   }
 
   // 拖拽
@@ -315,13 +351,15 @@ export default ({
             ) : (
               <div className="ve-transfer-tree-wrap">
                 <Tree
+                  defaultExpandAll={true}
                   draggable={{
                     icon: false,
                     nodeDraggable: (node: any) => true
                   }}
                   onDrop={onDrop}
+                  treeData={loop(rightTreeDataSource)}
                 >
-                  {renderRightTreeNode(rightTreeDataSource, null)}
+                  {/* {renderRightTreeNode(rightTreeDataSource, null)} */}
                 </Tree>
               </div>
             )
