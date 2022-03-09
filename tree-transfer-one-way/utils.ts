@@ -195,7 +195,9 @@ export const createFinalRightTree = (root: any, treeNode: any, parentTreeNode, t
   treeMapKey.forEach(_key => {
     const parentKey = treeMap[_key].parent
     isAddMap.set(treeMap[_key], false)
+    // 通过 loop 方法递归寻找相同的父节点并添加进去
     loop(parentKey, _key, treeNode, parentTreeNode, treeMap)
+    // 如果没有相同的父节点，则添加到根节点下
     if (!isAddMap.get(treeMap[_key])) {
       root.push(treeMap[_key])
     }
