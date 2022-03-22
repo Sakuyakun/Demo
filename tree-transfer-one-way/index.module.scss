@@ -52,6 +52,17 @@
       color: #348fff !important;
       font-weight: 500 !important;
     }
+
+    .transfer-button-wrap{
+      float: right;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .ant-tree .ant-tree-node-content-wrapper:hover{
+      .transfer-button-wrap{
+        opacity: 1;
+      }
+    }
   }
 
   .ant-tree-list .ant-tree-treenode,
