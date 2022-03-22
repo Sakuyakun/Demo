@@ -8,7 +8,8 @@ import { cloneDeep } from 'lodash'
 
 interface PropsITF {
   dataSource: any
-  values: any
+  values?: any
+  rightTree?: any,
   title: any
   className?: string
   emptyDataContent?: string
@@ -20,21 +21,24 @@ export default ({
   className = '',
   emptyDataContent = '暂无数据',
   values = [],
+  rightTree = [],
   ...props
 }: PropsITF) => {
   const { dataSource, handleEdit } = props
-  const { TreeNode } = Tree
+  // const { TreeNode } = Tree
 
   useEffect(() => {
     setLeftTreeDataSource(dataSource)
 
     if (values?.length) {
       setLeftCheckedKeys(values)
-      setPrevCheckedKeys(values)
       const newLeftTree = createDisabledSource(values, dataSource)
       setLeftTreeDataSource(newLeftTree)
     }
-  }, [dataSource, values])
+    if (rightTree?.length) {
+      setRightTreeDataSource(rightTree)
+    }
+  }, [dataSource, values, rightTree])
 
   // 左边树数据
   const [leftTreeDataSource, setLeftTreeDataSource] = useState([])
@@ -71,16 +75,16 @@ export default ({
       })
       const combieNewRightTreeMap = createCombieTree(filterNewRightTreeMap)
       const combieNewRightTreeMapKey = Object.keys(combieNewRightTreeMap)
-      console.log('combieNewRightTreeMap', combieNewRightTreeMap)
-      console.log('combieNewRightTreeMapKey', combieNewRightTreeMapKey)
+      // console.log('combieNewRightTreeMap', combieNewRightTreeMap)
+      // console.log('combieNewRightTreeMapKey', combieNewRightTreeMapKey)
 
       // 2. 根据 filterNewRightTreeMap 加入 rightTreeDataSource，递归对比
       // 如果没有相同key 但有相同父节点，将 treenode 加入父节点
       // 如果没有相同key 并且没有相同父节点，将 treenode 添加到根
       let finalTree = cloneDeep(rightTreeDataSource)
       createFinalRightTree(finalTree, finalTree, null, combieNewRightTreeMap, combieNewRightTreeMapKey)
-      console.log(finalTree)
       setRightTreeDataSource(finalTree)
+      console.log(finalTree)
     }
 
     // 根据左边选择的key值遍历左边树赋值disabled
@@ -102,13 +106,16 @@ export default ({
   const rightTreeDelete = (node: any) => {
     // 1. 获取删除的树节点key（包括该节点的children）
     const delKeys = getAllKey(node)
+
     // 2. 获取删除树节点key的所有父节点key
-    const nodePath = findPath(rightTreeDataSource, n => n.key === node.key)
+    const nodePath = findPath(dataSource, n => n.key === node.key)
     const nodePathKeys = nodePath.map(node => node.key)
     delKeys.push(...nodePathKeys)
 
     // 3. 在leftCheckedKeys中移除，并重新渲染左右树
-    const filterCheckedKeys = leftCheckedKeys.filter(key => delKeys.indexOf(key) === -1)
+    // keysIngornCurrNew：如果此刻左边树有勾选但未添加的，过滤掉，只获取leftCheckedKeys中已添加的
+    let keysIngornCurrNew = leftCheckedKeys.filter(key => currNewCheckedKeys.indexOf(key) === -1)
+    const filterCheckedKeys = keysIngornCurrNew.filter(key => delKeys.indexOf(key) === -1)
     setLeftCheckedKeys(filterCheckedKeys)
     setFilterCheckedKeys(filterCheckedKeys)
     setPrevCheckedKeys(filterCheckedKeys)
@@ -186,11 +193,16 @@ export default ({
       const title = (
         <div style={{ width: '100%' }}>
           <span>{item.title}</span>
-          <div style={{ float: 'right' }}>
+          <div className='transfer-button-wrap'>
             <a
               onClick={() => {
-                const sourceNode = findNode(dataSource, (n) => n.key === item.key)
-                handleEdit && handleEdit(item, sourceNode)
+                let sourceNode = findNode(dataSource, (n) => n.key === item.key)
+                let topName = rightTreeDataSource.map(item => item.name)
+                let isTop = true
+                if (topName.indexOf(item.name) === -1) {
+                  isTop = false
+                }
+                handleEdit && handleEdit(item, sourceNode, isTop)
               }}
               style={{ paddingRight: '10px' }}
             >
@@ -206,14 +218,10 @@ export default ({
         </div>
       )
       if (item.children) {
-        return { title, key: item.key, children: loop(item.children) };
+        return { ...item, title, children: loop(item.children) };
       }
 
-      return {
-        title,
-        key: item.key,
-        parent: item.parent
-      };
+      return item;
     });
   }
 
@@ -278,14 +286,19 @@ export default ({
     setRightTreeDataSource(data)
   }
 
-  // 修改节点title
-  const changeNodeTitle = (key, newTitle) => {
+  // 修改节点属性
+  const changeNode = (key, newTitle, changeContent) => {
     const newTree = cloneDeep(rightTreeDataSource)
-    
+
     const loop = (treeNode) => {
       treeNode.forEach(node => {
         if (node.key === key) {
-          node.title = newTitle
+          if (changeContent === 'title') {
+            node['title'] = newTitle
+            node['name'] = newTitle
+          } else {
+            node[changeContent] = newTitle
+          }
         } else if (node.children?.length > 0) {
           loop(node.children)
         }
@@ -297,7 +310,7 @@ export default ({
   }
   useImperativeHandle(props.onRef, () => {
     return {
-      changeNodeTitle: changeNodeTitle,
+      changeNode: changeNode,
       rightTreeDataSource: rightTreeDataSource
     }
   })
