@@ -20,10 +20,10 @@ export const filterSource = (keys: any, source: any, parent: string) => {
         })
       }
     } else if (keys.indexOf(item.key) > -1) {
-      sourceWithTag.push({
+      sourceWithTag.push(cloneDeep({
         ...item,
         parent
-      })
+      }))
     }
   })
 
