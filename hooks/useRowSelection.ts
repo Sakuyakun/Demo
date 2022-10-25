@@ -5,6 +5,9 @@ type RowKeysWithPageNum = {
   [key: string]: Key[]
 }
 
+// 在有分页的情况下，保留不同页面的勾选项
+// selectedRowKeys [1: [rowkey1, rowkey2], 2: [rowkey3]]
+// computedRowKeys [rowkey1, rowkey2, rowkey3]
 export default () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<RowKeysWithPageNum>({})
   const [computedRowKeys, setComputedRowKeys] = useState<Key[]>([])
